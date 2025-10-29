@@ -1,0 +1,102 @@
+import React from "react";
+import { motion } from "framer-motion";
+import { Mail, MessageSquare, Github, Linkedin, Twitter } from "lucide-react";
+import { Card } from "@/components/ui/card";
+
+export default function Contact() {
+  const contacts = [
+    {
+      icon: Mail,
+      title: "Email Us",
+      value: "team@cybersphere.security",
+      link: "mailto:team@cybersphere.security",
+      color: "from-teal-400 to-teal-600"
+    },
+    {
+      icon: MessageSquare,
+      title: "Support",
+      value: "support@cybersphere.security",
+      link: "mailto:support@cybersphere.security",
+      color: "from-blue-400 to-blue-600"
+    },
+    {
+      icon: Github,
+      title: "GitHub",
+      value: "Team CodeBlooded",
+      link: "#",
+      color: "from-purple-400 to-purple-600"
+    }
+  ];
+
+  return (
+    <div className="max-w-5xl mx-auto px-6 py-12">
+      {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-16"
+      >
+        <div className="inline-flex items-center gap-2 bg-teal-500/10 border border-teal-500/30 rounded-full px-6 py-2 mb-6">
+          <MessageSquare className="w-4 h-4 text-teal-400" />
+          <span className="text-teal-400 text-sm font-medium">Get in Touch</span>
+        </div>
+        
+        <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-teal-400 via-teal-300 to-blue-400 bg-clip-text text-transparent">
+          Let's Connect
+        </h1>
+        
+        <p className="text-xl opacity-80 max-w-3xl mx-auto">
+          Have questions, feedback, or want to collaborate? Team CodeBlooded is here to help 
+          make the digital world safer together.
+        </p>
+      </motion.div>
+
+      {/* Contact Cards */}
+      <div className="grid md:grid-cols-3 gap-6 mb-12">
+        {contacts.map((contact, index) => (
+          <motion.a
+            key={contact.title}
+            href={contact.link}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <Card className="backdrop-blur-xl bg-white/5 border-white/10 p-6 rounded-2xl shadow-2xl hover:bg-white/10 transition-all duration-300 h-full">
+              <div className={w-14 h-14 rounded-xl bg-gradient-to-br ${contact.color} flex items-center justify-center shadow-lg mb-4}>
+                <contact.icon className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-lg font-bold mb-2 opacity-90">{contact.title}</h3>
+              <p className="text-teal-400 hover:text-teal-300 transition-colors">{contact.value}</p>
+            </Card>
+          </motion.a>
+        ))}
+      </div>
+
+      {/* Additional Info */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <Card className="backdrop-blur-xl bg-gradient-to-br from-teal-500/10 to-blue-500/10 border border-white/10 p-12 rounded-2xl shadow-2xl text-center">
+          <h2 className="text-3xl font-bold mb-4 opacity-90">Join Our Mission</h2>
+          <p className="opacity-70 text-lg mb-6 max-w-2xl mx-auto">
+            We're always looking for passionate individuals who want to contribute to a safer digital future. 
+            Whether you're a developer, researcher, or cybersecurity enthusiast, let's build something amazing together.
+          </p>
+          <div className="flex justify-center gap-4">
+            <a href="#" className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all duration-300">
+              <Github className="w-5 h-5 opacity-80" />
+            </a>
+            <a href="#" className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all duration-300">
+              <Linkedin className="w-5 h-5 opacity-80" />
+            </a>
+            <a href="#" className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all duration-300">
+              <Twitter className="w-5 h-5 opacity-80" />
+            </a>
+          </div>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}

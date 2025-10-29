@@ -1,0 +1,47 @@
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Globe, Search, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { base44 } from "@/api/base44Client";
+import ScanResult from "./ScanResult";
+
+export default function WebsiteScanner() {
+  const [url, setUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const handleScan = async () => {
+    if (!url) return;
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const analysis = await base44.integrations.Core.InvokeLLM({
+        prompt: `Analyze this URL for security threats: ${url}
+        
+        Check for:
+        - Phishing indicators
+        - Malware/virus risks
+        - SSL certificate validity
+        - Domain reputation
+        - Suspicious patterns
+        
+        Provide:
+        1. Safety score (0-100, where 100 is completely safe)
+        2. Whether it's safe (true/false)
+        3. Detailed analysis
+        4. List of 3-5 specific recommendations`,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            safety_score: { type: "number" },
+            is_safe: { type: "boolean" },
+            analysis: { type: "string" },
+            recommendations: { type: "array", items: { type: "string" } }
+          }
+        }
+      });

@@ -1,0 +1,44 @@
+{
+  "name": "ScanRecord",
+  "type": "object",
+  "properties": {
+    "scan_type": {
+      "type": "string",
+      "enum": [
+        "website",
+        "news",
+        "media",
+        "deepfake"
+      ],
+      "description": "Type of scan performed"
+    },
+    "input_data": {
+      "type": "string",
+      "description": "URL, text, or file URL that was scanned"
+    },
+    "safety_score": {
+      "type": "number",
+      "description": "Safety percentage (0-100)"
+    },
+    "is_safe": {
+      "type": "boolean",
+      "description": "Whether the content is safe"
+    },
+    "analysis": {
+      "type": "string",
+      "description": "Detailed analysis from AI"
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Recommendations for action"
+    }
+  },
+  "required": [
+    "scan_type",
+    "safety_score",
+    "is_safe"
+  ]
+}

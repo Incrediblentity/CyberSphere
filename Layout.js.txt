@@ -1,0 +1,167 @@
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { Shield, Home, Users, HelpCircle, Mail, Sun, Moon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import MatrixRain from "./components/MatrixRain";
+import AnimatedShield from "./components/AnimatedShield";
+
+export default function Layout({ children, currentPageName }) {
+  const location = useLocation();
+  const [theme, setTheme] = useState("dark");
+  const [scanResult, setScanResult] = useState(null);
+
+  useEffect(() => {
+    const handleScanResult = (event) => {
+      setScanResult(event.detail);
+      setTimeout(() => setScanResult(null), 10000);
+    };
+
+    window.addEventListener("scanResult", handleScanResult);
+    return () => window.removeEventListener("scanResult", handleScanResult);
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
+  const getBackgroundColor = () => {
+    if (scanResult === "safe") return "bg-emerald-900";
+    if (scanResult === "malicious") return "bg-red-900";
+    return theme === "dark" ? "bg-[#0A1929]" : "bg-white";
+  };
+
+  const navigationItems = [
+    { name: "Home", icon: Home, url: createPageUrl("Home") },
+    { name: "About Us", icon: Users, url: createPageUrl("AboutUs") },
+    { name: "HELP", icon: HelpCircle, url: createPageUrl("Help") },
+    { name: "Contact", icon: Mail, url: createPageUrl("Contact") },
+  ];
+
+  // Dynamic text color classes based on theme
+  const textPrimary = theme === "dark" ? "text-white" : "text-gray-900";
+  const textSecondary = theme === "dark" ? "text-white/70" : "text-gray-700";
+  const textTertiary = theme === "dark" ? "text-white/60" : "text-gray-600";
+
+  return (
+    <div className={min-h-screen ${getBackgroundColor()} transition-all duration-1000 relative overflow-hidden}>
+      <MatrixRain opacity={theme === "dark" ? 0.15 : 0.08} />
+      <AnimatedShield />
+      
+      {/* Glassmorphism Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div className="max-w-7xl mx-auto">
+          <div className={backdrop-blur-xl ${theme === "dark" ? "bg-white/10" : "bg-gray-900/10"} rounded-2xl border ${theme === "dark" ? "border-white/20" : "border-gray-900/20"} shadow-2xl px-6 py-3}>
+            <div className="flex items-center justify-between">
+              {/* Logo */}
+              <Link to={createPageUrl("Home")} className="flex items-center gap-3 group">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <span className={text-2xl font-bold ${theme === "dark" ? "bg-gradient-to-r from-teal-300 to-white" : "bg-gradient-to-r from-teal-600 to-gray-900"} bg-clip-text text-transparent}>
+                  CyberSphere
+                </span>
+              </Link>
+
+              {/* Navigation Items */}
+              <div className="flex items-center gap-2">
+                {navigationItems.map((item) => (
+                  <Link key={item.name} to={item.url}>
+                    <Button
+                      variant="ghost"
+                      className={`relative overflow-hidden group px-6 py-2 rounded-xl transition-all duration-300
+                        ${location.pathname === item.url 
+                          ? ${theme === "dark" ? "bg-white/20 text-white" : "bg-gray-900/20 text-gray-900"} backdrop-blur-lg shadow-lg 
+                          : ${theme === "dark" ? "text-white/80 hover:text-white hover:bg-white/10" : "text-gray-900/80 hover:text-gray-900 hover:bg-gray-900/10"}
+                        }`}
+                    >
+                      <item.icon className="w-4 h-4 mr-2" />
+                      <span className="font-medium">{item.name}</span>
+                      {location.pathname === item.url && (
+                        <div className={absolute inset-0 ${theme === "dark" ? "bg-gradient-to-r from-teal-400/20" : "bg-gradient-to-r from-teal-600/20"} to-transparent rounded-xl} />
+                      )}
+                    </Button>
+                  </Link>
+                ))}
+
+                {/* Theme Toggle */}
+                <Button
+                  onClick={toggleTheme}
+                  variant="ghost"
+                  size="icon"
+                  className={ml-4 rounded-xl ${theme === "dark" ? "bg-white/10 hover:bg-white/20 text-white" : "bg-gray-900/10 hover:bg-gray-900/20 text-gray-900"} backdrop-blur-lg transition-all duration-300}
+                >
+                  {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className={relative z-30 pt-24 ${textPrimary}}>
+        {children}
+      </main>
+
+      {/* Footer */}
+      <footer className={relative z-10 mt-20 py-8 border-t ${theme === "dark" ? "border-white/10" : "border-gray-900/10"}}>
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className={${textTertiary} text-sm}>
+            © 2025 CyberSphere by Team CodeBlooded. Protecting the digital realm, one scan at a time.
+          </p>
+        </div>
+      </footer>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+          font-family: 'Inter', sans-serif;
+        }
+        
+        ${theme === "dark" ? `
+          :root {
+            --background: #0A1929;
+            --foreground: #ffffff;
+            --card: rgba(255, 255, 255, 0.05);
+            --card-foreground: #ffffff;
+            --primary: #14B8A6;
+            --primary-foreground: #ffffff;
+          }
+        ` : `
+          :root {
+            --background: #ffffff;
+            --foreground: #1e293b;
+            --card: rgba(30, 41, 59, 0.05);
+            --card-foreground: #1e293b;
+            --primary: #14B8A6;
+            --primary-foreground: #ffffff;
+          }
+        `}
+
+        ${scanResult === "safe" ? `
+          :root {
+            --background: #064E3B;
+            --foreground: #ffffff;
+            --card: rgba(255, 255, 255, 0.1);
+            --card-foreground: #ffffff;
+            --primary: #10B981;
+            --primary-foreground: #ffffff;
+          }
+        ` : ""}
+
+        ${scanResult === "malicious" ? `
+          :root {
+            --background: #7F1D1D;
+            --foreground: #ffffff;
+            --card: rgba(255, 255, 255, 0.1);
+            --card-foreground: #ffffff;
+            --primary: #EF4444;
+            --primary-foreground: #ffffff;
+          }
+        ` : ""}
+      `}</style>
+    </div>
+  );
+}

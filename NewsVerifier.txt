@@ -1,0 +1,110 @@
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Newspaper, CheckCircle, Loader2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { base44 } from "@/api/base44Client";
+import ScanResult from "./ScanResult";
+
+export default function NewsVerifier() {
+  const [news, setNews] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const handleVerify = async () => {
+    if (!news) return;
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const analysis = await base44.integrations.Core.InvokeLLM({
+        prompt: `Verify the factual accuracy of this news/text:
+        "${news}"
+        
+        Check for:
+        - Factual accuracy
+        - Misinformation or fake news indicators
+        - Bias or propaganda
+        - Source credibility
+        - Logical consistency
+        
+        Provide:
+        1. Safety score (0-100, where 100 means completely factual and trustworthy)
+        2. Whether it's safe/factual (true/false)
+        3. Detailed analysis explaining why
+        4. List of 3-5 specific recommendations or actions`,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            safety_score: { type: "number" },
+            is_safe: { type: "boolean" },
+            analysis: { type: "string" },
+            recommendations: { type: "array", items: { type: "string" } }
+          }
+        }
+      });
+
+      await base44.entities.ScanRecord.create({
+        scan_type: "news",
+        input_data: news,
+        safety_score: analysis.safety_score,
+        is_safe: analysis.is_safe,
+        analysis: analysis.analysis,
+        recommendations: analysis.recommendations
+      });
+
+      setResult(analysis);
+      window.dispatchEvent(new CustomEvent("scanResult", { 
+        detail: analysis.is_safe ? "safe" : "malicious" 
+      }));
+    } catch (error) {
+      console.error("Verification failed:", error);
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <Card className="backdrop-blur-xl bg-white/5 border-white/10 p-8 rounded-2xl shadow-2xl">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shadow-lg">
+          <Newspaper className="w-6 h-6 text-white" />
+        </div>
+        <div>
+          <h3 className="text-2xl font-bold text-white">News Verifier</h3>
+          <p className="text-white/60 text-sm">Verify factual accuracy and detect fake news</p>
+        </div>
+      </div>
+
+      <Textarea
+        placeholder="Paste news article or text to verify..."
+        value={news}
+        onChange={(e) => setNews(e.target.value)}
+        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-purple-400 min-h-32 mb-4"
+      />
+
+      <Button
+        onClick={handleVerify}
+        disabled={loading || !news}
+        className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+      >
+        {loading ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Verifying...
+          </>
+        ) : (
+          <>
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Verify News
+          </>
+        )}
+      </Button>
+
+      {result && <ScanResult result={result} type="News" />}
+    </Card>
+  );
+}
